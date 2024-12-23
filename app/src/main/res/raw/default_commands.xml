@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<commands>
+    <command>
+        <desc>Get Device Info</desc>
+        <cmd>0x01 0x00</cmd>
+        <resp>0x01 0x00 0xAA</resp>
+    </command>
+    <command>
+        <desc>Get Battery Level</desc>
+        <cmd>0x02 0x00</cmd>
+        <resp>0x02 0x00 0x64</resp>
+    </command>
+    <command>
+        <desc>Get Firmware Version</desc>
+        <cmd>0x03 0x00</cmd>
+        <resp>0x03 0x00 0x01 0x02</resp>
+    </command>
+</commands>

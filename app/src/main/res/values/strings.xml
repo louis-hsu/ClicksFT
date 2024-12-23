@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">ClicksFT</string>
+    <string name="button_name">Load Cmd/Resp Table</string>
+</resources>
