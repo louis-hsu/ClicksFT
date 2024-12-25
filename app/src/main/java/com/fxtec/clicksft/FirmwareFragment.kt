@@ -13,26 +13,57 @@ class FirmwareFragment : Fragment() {
     private val textViewDebugInfo get() = _textViewDebugInfo!!
     private var usbDeviceHandler: UsbDeviceHandler? = null
 
+    companion object {
+        private const val TAG = "FirmwareFragment"
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_firmware, container, false)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _textViewDebugInfo = view.findViewById(R.id.textViewDebugInfo)
-        textViewDebugInfo.text = "Waiting for USB device..."
-
-        // Update interface info if device is already connected
-        updateInterfaceInfo()
+        _textViewDebugInfo?.text = "Waiting for USB device..."
+        Log.d(TAG, "textViewDebugInfo init text set")
+        //setInitialText()
     }
 
-    fun onDeviceConnected(handler: UsbDeviceHandler) {
+    private fun setInitialText() {
+        _textViewDebugInfo?.let { textView ->
+            // If we have a handler and device, show interface info, otherwise show waiting message
+            if (usbDeviceHandler != null) {
+                updateInterfaceInfo()
+            } else {
+                textView.text = "Waiting for USB device..."
+            }
+        }
+    }
+
+    fun onDeviceConnected(handler: UsbDeviceHandler?) {
+        Log.d(TAG, "onDeviceConnected called")
         usbDeviceHandler = handler
         updateInterfaceInfo()
     }
 
     private fun updateInterfaceInfo() {
+        Log.d(TAG, "updateInterfaceInfo called")
         activity?.runOnUiThread {
             _textViewDebugInfo?.let { textView ->
-                val info = usbDeviceHandler?.getInterfaceInfo() ?: "No device connected"
-                textView.text = info
-                Log.d("FirmwareFragment", "Updated interface info")
+                if (usbDeviceHandler != null) {
+                    val info = usbDeviceHandler?.getInterfaceInfo()
+                    Log.d(TAG, "Interface info updated: $info")
+                    textView.text = when (info) {
+                        "No device connected" -> "Waiting for USB device..."
+                        else -> info
+                    }
+                } else {
+                    textView.text = "Waiting for USB device..."
+                }
             }
         }
     }

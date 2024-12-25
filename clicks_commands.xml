@@ -34,7 +34,8 @@
         <desc>Turn SHIFT sticky on</desc>
         <cmd>0x04 0x83 0x02 0x02</cmd>
         <resp>0x05 0x02 0x83 0x00 0x02</resp>
-    </command>
+		</command>
+	<!--
     <command>
         <desc>Turn SHIFT sticky off</desc>
         <cmd>0x04 0x83 0x02 0x00</cmd>
@@ -169,5 +170,6 @@
         <desc>Get event status</desc>
         <cmd>0x02 0x8D</cmd>
         <resp>0x05 0x02 0x8D 0x00</resp>
-    </command>
+		</command>
+	-->
 </commands>
