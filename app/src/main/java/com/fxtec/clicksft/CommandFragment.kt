@@ -1,5 +1,6 @@
 package com.fxtec.clicksft
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,6 +11,7 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
@@ -20,7 +22,23 @@ class CommandFragment : Fragment() {
     private lateinit var textViewCommand: TextView
     private lateinit var textViewResponse: TextView
     private lateinit var buttonLoadXml: Button
+    private lateinit var buttonReset: Button
     private val commands = mutableListOf<UsbCommand>()
+    private var xmlFileUri: Uri? = null
+
+    private val openDocument = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+        uri?.let {
+            requireActivity().contentResolver.takePersistableUriPermission(
+                it,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+            xmlFileUri = it
+            loadCommands()
+            setupSpinner()
+        }
+    }
 
     companion object {
         private const val DEFAULT_SELECTION = "Please select"
@@ -41,35 +59,67 @@ class CommandFragment : Fragment() {
         textViewCommand = view.findViewById(R.id.textViewCommand)
         textViewResponse = view.findViewById(R.id.textViewResponse)
         buttonLoadXml = view.findViewById(R.id.buttonLoadXml)
+        buttonReset = view.findViewById(R.id.buttonReset)
 
         buttonLoadXml.setOnClickListener {
-            (activity as? MainActivity)?.openXmlFilePicker()
+            openXmlFilePicker()
         }
 
+        buttonReset.setOnClickListener {
+            resetToDefault()
+        }
+
+        //checkPersistedXmlFile()
         loadCommands()
         setupSpinner()
+    }
+
+    private fun resetToDefault() {
+        // Clear persisted permissions if any
+        xmlFileUri?.let { uri ->
+            try {
+                requireActivity().contentResolver.releasePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        xmlFileUri = null
+        loadCommands()
+        setupSpinner()
+    }
+
+    private fun checkPersistedXmlFile() {
+        requireActivity().contentResolver.persistedUriPermissions.firstOrNull()?.uri?.let {
+            xmlFileUri = it
+        }
+    }
+
+    private fun openXmlFilePicker() {
+        openDocument.launch(arrayOf("text/xml"))
     }
 
     private fun loadCommands() {
         commands.clear()
 
-        (activity as? MainActivity)?.getXmlFileUri()?.let { uri ->
-            activity?.contentResolver?.openInputStream(uri)?.use { stream ->
-                parseXmlFile(stream)
-                return
+        // Try to load from custom XML file if available
+        xmlFileUri?.let { uri ->
+            try {
+                requireActivity().contentResolver.openInputStream(uri)?.use { stream ->
+                    parseXmlFile(stream)
+                    return
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                // If custom XML fails, fall back to default
             }
         }
 
+        // Load default commands if no custom XML or if custom XML failed
         val defaultXmlStream = resources.openRawResource(R.raw.default_commands)
         parseXmlFile(defaultXmlStream)
-    }
-
-    fun updateXmlFile(uri: Uri) {
-        commands.clear()
-        activity?.contentResolver?.openInputStream(uri)?.use { stream ->
-            parseXmlFile(stream)
-            setupSpinner()
-        }
     }
 
     private fun parseXmlFile(inputStream: InputStream) {
@@ -99,10 +149,6 @@ class CommandFragment : Fragment() {
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            if (inputStream != resources.openRawResource(R.raw.default_commands)) {
-                val defaultXmlStream = resources.openRawResource(R.raw.default_commands)
-                parseXmlFile(defaultXmlStream)
-            }
         }
     }
 
@@ -135,5 +181,10 @@ class CommandFragment : Fragment() {
                 textViewResponse.text = ""
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        resetToDefault()
     }
 }

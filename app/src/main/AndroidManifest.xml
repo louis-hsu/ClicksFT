@@ -18,6 +18,7 @@
 
         <activity
             android:name=".MainActivity"
+            android:launchMode="singleTask"
             android:exported="true"
             android:theme="@style/Theme.ClicksFT">
             <intent-filter>

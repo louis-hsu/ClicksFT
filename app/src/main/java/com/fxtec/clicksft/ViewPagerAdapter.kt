@@ -29,4 +29,8 @@ class ViewPagerAdapter(fragmentActivity: FragmentActivity) :
     fun setCurrentPosition(position: Int) {
         currentPosition = position
     }
+
+    fun getFragmentByPosition(position: Int): Fragment? {
+        return fragments[position]
+    }
 }
