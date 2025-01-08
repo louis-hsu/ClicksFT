@@ -30,17 +30,6 @@ class UsbDeviceHandler(private val context: Context) {
         private const val TIMEOUT = 1000    // Milliconds
     }
 
-    // Initial textView assignment
-    /*
-    fun setDeviceInfo(textView: TextView) {
-        Log.d(TAG, "deviceInfoTextView initialized")
-        deviceInfoTextView = textView
-        deviceInfoTextView?.let {
-            it.text = "Device disconnected"
-            Log.d(TAG, "TextView text set to: ${it.text}")
-        } ?: Log.e(TAG, "deviceInfoTextView is null after assignment")
-    }
-     */
     fun setDeviceInfo(textView: TextView) {
         Log.d(TAG, "deviceInfoTextView initialized")
         deviceInfoTextView = textView
@@ -178,8 +167,6 @@ class UsbDeviceHandler(private val context: Context) {
 
         return true
     }
-
-
 
     private fun getEndpointType(type: Int): String = when (type) {
         UsbConstants.USB_ENDPOINT_XFER_CONTROL -> "Control"

@@ -1,6 +1,5 @@
 package com.fxtec.clicksft
 
-//import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -59,7 +58,6 @@ class MainActivity : AppCompatActivity() {
         tabLayout = findViewById(R.id.tabLayout)
         textViewDeviceInfo = findViewById(R.id.textViewDeviceInfo)
         usbDeviceHandler.setDeviceInfo(findViewById(R.id.textViewDeviceInfo))
-        //textViewDeviceInfo.text = "Device disconnected"
 
         // Register USB intents
         registerReceiver(usbReceiver, IntentFilter().apply {

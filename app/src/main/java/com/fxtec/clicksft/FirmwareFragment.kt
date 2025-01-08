@@ -16,7 +16,6 @@ class FirmwareFragment : Fragment() {
     //private var _textViewDebugInfo: TextView? = null
     //private val textViewDebugInfo get() = _textViewDebugInfo!!
     private var usbDeviceHandler: UsbDeviceHandler? = null
-    private var pendingHandler: UsbDeviceHandler? = null
 
     companion object {
         private const val TAG = "FirmwareFragment"
@@ -34,39 +33,28 @@ class FirmwareFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.textViewDebugInfo.text = "Waiting for USB device..."
+        //_textViewDebugInfo = view.findViewById(R.id.textViewDebugInfo)
+        //_textViewDebugInfo?.text = "Waiting for USB device..."
+        //setInitialText()
+    }
 
-        pendingHandler?.let{
-            firmwareTabUpdate(it)
+    /*
+    private fun setInitialText() {
+        _textViewDebugInfo?.let { textView ->
+            // If we have a handler and device, show interface info, otherwise show waiting message
+            if (usbDeviceHandler != null) {
+                updateInterfaceInfo()
+            } else {
+                textView.text = "Waiting for USB device..."
+            }
         }
     }
+    */
 
     fun firmwareTabUpdate(handler: UsbDeviceHandler?) {
         Log.d(TAG, "FirmwareTab: Updating fragment")
+        usbDeviceHandler = handler
 
-        // If view is not created yet, store the handler for later
-        if (_binding == null) {
-            pendingHandler = handler
-            return
-        }
-
-        try {
-            if (handler?.getDeviceInfo() == null) {
-                binding.textViewDebugInfo.text = "Waiting for USB device..."
-            } else {
-                Log.d(TAG, "FirmwareTab: Updating interfaces info")
-                val info = handler.printInterfaceInfo()
-                binding.textViewDebugInfo.text = when (info) {
-                    "Device disconnected" -> "Waiting for USB device..."
-                    else -> info
-                }
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error updating firmware tab", e)
-            _binding?.textViewDebugInfo?.text = "Waiting for USB device..."
-        }
-
-
-        /*
         // Print out interface info temporary as debug info
         if (usbDeviceHandler?.getDeviceInfo() == null) {
             binding.textViewDebugInfo.text = "Waiting for USB device..."
@@ -80,8 +68,25 @@ class FirmwareFragment : Fragment() {
                 }
             }
         }
-        */
     }
+    /*
+    private fun updateInterfaceInfo() {
+        activity?.runOnUiThread {
+            binding.textViewDebugInfo.let { textView ->
+                if (usbDeviceHandler != null) {
+                    val info = usbDeviceHandler?.getInterfaceInfo()
+                    Log.d(TAG, "Interface info updated: $info")
+                    textView.text = when (info) {
+                        "No device connected" -> "Waiting for USB device..."
+                        else -> info
+                    }
+                } else {
+                    textView.text = "Waiting for USB device..."
+                }
+            }
+        }
+    }
+    */
 
     override fun onDestroyView() {
         super.onDestroyView()
