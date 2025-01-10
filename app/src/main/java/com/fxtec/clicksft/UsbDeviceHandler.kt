@@ -127,7 +127,6 @@ class UsbDeviceHandler(private val context: Context) {
         }
         val result = sb.toString()
 
-        //Log.d(TAG, "Interface info: $result")
         return result
     }
 

@@ -5,7 +5,6 @@ import android.net.Uri
 import android.util.AttributeSet
 import android.util.Log
 import android.widget.*
-import androidx.activity.result.ActivityResultLauncher
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 import java.io.InputStream
@@ -28,7 +27,6 @@ class CommandTabView @JvmOverloads constructor(
     private lateinit var buttonReset: Button
     private val commands = mutableListOf<UsbCommand>()
     private var xmlFileUri: Uri? = null
-    //private var documentLauncher: ActivityResultLauncher<Array<String>>? = null
     private var documentPickerHelper: DocumentPickerHelper? = null
 
     companion object {
@@ -44,12 +42,6 @@ class CommandTabView @JvmOverloads constructor(
         setupSpinner()
     }
 
-    /*
-    fun setDocumentLauncher(launcher: ActivityResultLauncher<Array<String>>) {
-        documentLauncher = launcher
-    }
-    */
-
     fun setDocumentPickerHelper(handler: DocumentPickerHelper) {
         documentPickerHelper = handler
     }
@@ -64,7 +56,6 @@ class CommandTabView @JvmOverloads constructor(
 
     private fun setupButtons() {
         buttonLoadXml.setOnClickListener {
-            //documentLauncher?.launch(arrayOf("text/xml"))
             documentPickerHelper?.launchDocumentPicker()
         }
 
