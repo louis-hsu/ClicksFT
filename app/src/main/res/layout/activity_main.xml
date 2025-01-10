@@ -5,9 +5,9 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/textViewDeviceInfo"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:id="@+id/textViewDeviceInfo"
         android:padding="16dp"
         android:layout_marginTop="10dp"
         android:gravity="start"
@@ -20,10 +20,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/viewPager"
+    <com.fxtec.clicksft.CommandTabView
+        android:id="@+id/commandTabView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
+
+    <com.fxtec.clicksft.FirmwareTabView
+        android:id="@+id/firmwareTabView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:visibility="gone" />
 
 </LinearLayout>
