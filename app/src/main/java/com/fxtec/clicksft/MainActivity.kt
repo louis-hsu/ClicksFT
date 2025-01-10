@@ -15,7 +15,7 @@ import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import android.net.Uri
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), CommandTabView.DocumentPickerHelper {
     private lateinit var tabLayout: TabLayout
     private lateinit var commandTabView: CommandTabView
     private lateinit var firmwareTabView: FirmwareTabView
@@ -49,13 +49,18 @@ class MainActivity : AppCompatActivity() {
         usbDeviceHandler.findAndConnectDevice()
     }
 
+    // Implementation of interface in CommandTabView
+    override fun launchDocumentPicker() {
+        openDocument.launch(arrayOf("text/xml"))
+    }
+
     private fun initializeViews() {
         tabLayout = findViewById(R.id.tabLayout)
         commandTabView = findViewById(R.id.commandTabView)
         firmwareTabView = findViewById(R.id.firmwareTabView)
         textViewDeviceInfo = findViewById(R.id.textViewDeviceInfo)
 
-        commandTabView.setDocumentLauncher(openDocument)
+        commandTabView.setDocumentPickerHelper(this)
 
         usbDeviceHandler = UsbDeviceHandler(this)
         usbDeviceHandler.setDeviceInfo(textViewDeviceInfo)

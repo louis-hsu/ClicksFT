@@ -17,6 +17,10 @@ class CommandTabView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
+    interface DocumentPickerHelper {
+        fun launchDocumentPicker()
+    }
+
     private lateinit var spinner: Spinner
     private lateinit var textViewCommand: TextView
     private lateinit var textViewResponse: TextView
@@ -24,7 +28,8 @@ class CommandTabView @JvmOverloads constructor(
     private lateinit var buttonReset: Button
     private val commands = mutableListOf<UsbCommand>()
     private var xmlFileUri: Uri? = null
-    private var documentLauncher: ActivityResultLauncher<Array<String>>? = null
+    //private var documentLauncher: ActivityResultLauncher<Array<String>>? = null
+    private var documentPickerHelper: DocumentPickerHelper? = null
 
     companion object {
         private const val DEFAULT_SELECTION = "Please select"
@@ -39,8 +44,14 @@ class CommandTabView @JvmOverloads constructor(
         setupSpinner()
     }
 
+    /*
     fun setDocumentLauncher(launcher: ActivityResultLauncher<Array<String>>) {
         documentLauncher = launcher
+    }
+    */
+
+    fun setDocumentPickerHelper(handler: DocumentPickerHelper) {
+        documentPickerHelper = handler
     }
 
     private fun initializeViews() {
@@ -53,7 +64,8 @@ class CommandTabView @JvmOverloads constructor(
 
     private fun setupButtons() {
         buttonLoadXml.setOnClickListener {
-            documentLauncher?.launch(arrayOf("text/xml"))
+            //documentLauncher?.launch(arrayOf("text/xml"))
+            documentPickerHelper?.launchDocumentPicker()
         }
 
         buttonReset.setOnClickListener {
