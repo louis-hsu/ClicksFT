@@ -14,6 +14,7 @@ There are 2 main featurs which are represented/operated in the correpsonding tab
   * Select different command table to execute in case default commands are changed
 
 2. Firmware
+
    Not defined yet. Show keyboard interface info as debug info
 
 ## Command tab 
