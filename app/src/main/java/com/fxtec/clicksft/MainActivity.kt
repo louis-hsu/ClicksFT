@@ -63,6 +63,8 @@ class MainActivity : AppCompatActivity(), CommandTabView.DocumentPickerHelper {
 
         usbDeviceHandler = UsbDeviceHandler(this)
         usbDeviceHandler.setDeviceInfo(textViewDeviceInfo)
+
+        commandTabView.setUsbDeviceHandler(usbDeviceHandler)
     }
 
     private fun setupTabs() {
@@ -110,9 +112,13 @@ class MainActivity : AppCompatActivity(), CommandTabView.DocumentPickerHelper {
     }
 
     private fun updateTabsIfNeeded() {
-        if (tabLayout.selectedTabPosition == 1) {
-            firmwareTabView.updateFirmwareInfo(usbDeviceHandler)
+        when (tabLayout.selectedTabPosition) {
+            0 -> commandTabView.setUsbDeviceHandler(usbDeviceHandler)
+            1 -> firmwareTabView.updateFirmwareInfo(usbDeviceHandler)
         }
+        //if (tabLayout.selectedTabPosition == 1) {
+        //    firmwareTabView.updateFirmwareInfo(usbDeviceHandler)
+        //}
     }
 
     private fun setupUsbReceiver() {

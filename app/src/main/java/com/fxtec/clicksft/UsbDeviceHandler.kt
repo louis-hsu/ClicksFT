@@ -113,12 +113,14 @@ class UsbDeviceHandler(private val context: Context) {
             sb.append("Interface $i:\n")
             sb.append("  Interface ID: ${interface_.id}\n")
             sb.append("  Interface Class: ${interface_.interfaceClass}\n")
+            sb.append("  Interface Subclass: ${interface_.interfaceSubclass}\n")
             sb.append("  Endpoint Count: ${interface_.endpointCount}\n")
 
             for (j in 0 until interface_.endpointCount) {
                 val endpoint = interface_.getEndpoint(j)
                 sb.append("    Endpoint $j:\n")
-                sb.append("      Address: ${endpoint.address}\n")
+                //sb.append("      Address: ${endpoint.address}\n")
+                sb.append("      Address: ${endpoint.endpointNumber}\n")
                 sb.append("      Direction: ${if (endpoint.direction == UsbConstants.USB_DIR_IN) "IN" else "OUT"}\n")
                 sb.append("      Type: ${getEndpointType(endpoint.type)}\n")
                 sb.append("      Max Packet Size: ${endpoint.maxPacketSize}\n")
@@ -127,10 +129,11 @@ class UsbDeviceHandler(private val context: Context) {
         }
         val result = sb.toString()
 
+        //Log.d(TAG, "Interface info: $result")
         return result
     }
 
-    private fun setupInterface(): Boolean {
+    fun setupInterface(): Boolean {
         val device = usbDevice ?: return false
 
         // Get/claim interface with specific index
@@ -148,16 +151,6 @@ class UsbDeviceHandler(private val context: Context) {
         // Get endpoints with specific index
         endpointIn = usbInterface!!.getEndpoint(ENDPOINT_IN_INDEX)
         endpointOut = usbInterface!!.getEndpoint(ENDPOINT_OUT_INDEX)
-        /*
-        for (i in 0 until usbInterface!!.endpointCount) {
-            val endpoint = usbInterface!!.getEndpoint(i)
-            if (endpoint.direction == UsbConstants.USB_DIR_IN) {
-                endpointIn = endpoint
-            } else if (endpoint.direction == UsbConstants.USB_DIR_OUT) {
-                endpointOut = endpoint
-            }
-        }
-         */
 
         if (endpointIn == null || endpointOut == null) {
             Log.e(TAG, "Could not get endpoints")
@@ -192,6 +185,25 @@ class UsbDeviceHandler(private val context: Context) {
         if (!isDeviceReady()) return null
 
         val buffer = ByteArray(bufferSize)
+        val bytesRead = usbConnection?.bulkTransfer(
+            endpointIn,
+            buffer,
+            buffer.size,
+            TIMEOUT
+        ) ?: -1
+
+        return when {
+            bytesRead > 0 -> buffer.copyOf(bytesRead)  // Only return the actual bytes read
+            bytesRead == 0 -> ByteArray(0)  // Empty response
+            else -> null  // Error occurred
+        }
+    }
+
+    /*
+    fun readCommand(bufferSize: Int = 64): ByteArray? {
+        if (!isDeviceReady()) return null
+
+        val buffer = ByteArray(bufferSize)
         val result = usbConnection?.bulkTransfer(
             endpointIn,
             buffer,
@@ -201,6 +213,7 @@ class UsbDeviceHandler(private val context: Context) {
 
         return if (result > 0) buffer.copyOf(result) else null
     }
+    */
 
     private fun isDeviceReady(): Boolean {
         return usbConnection != null &&

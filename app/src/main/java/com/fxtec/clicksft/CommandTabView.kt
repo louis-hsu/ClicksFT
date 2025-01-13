@@ -28,6 +28,7 @@ class CommandTabView @JvmOverloads constructor(
     private val commands = mutableListOf<UsbCommand>()
     private var xmlFileUri: Uri? = null
     private var documentPickerHelper: DocumentPickerHelper? = null
+    private var usbDeviceHandler: UsbDeviceHandler? = null
 
     companion object {
         private const val DEFAULT_SELECTION = "Please select"
@@ -44,6 +45,10 @@ class CommandTabView @JvmOverloads constructor(
 
     fun setDocumentPickerHelper(handler: DocumentPickerHelper) {
         documentPickerHelper = handler
+    }
+
+    fun setUsbDeviceHandler(handler: UsbDeviceHandler) {
+        usbDeviceHandler = handler
     }
 
     private fun initializeViews() {
@@ -126,6 +131,62 @@ class CommandTabView @JvmOverloads constructor(
         }
     }
 
+    private fun executeCommand(command: UsbCommand) {
+        // Convert hex string to bytes (handles both with and without 0x prefix)
+        val commandBytes = try {
+            command.command.split(" ")
+                .filter { it.isNotEmpty() }
+                .map { hex ->
+                    val cleanHex = hex.removePrefix("0x")
+                    cleanHex.toInt(16).toByte()
+                }
+                .toByteArray()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to parse command: ${command.command}", e)
+            textViewResponse.text = "Invalid command format. Expected space-separated hex values (with optional 0x prefix)"
+            return
+        }
+
+        // Ensure interface is setup before sending
+        if (usbDeviceHandler?.setupInterface() != true) {
+            textViewResponse.text = "Failed to setup USB interface"
+            return
+        }
+
+        // Send command
+        val sendSuccess = usbDeviceHandler?.sendCommand(commandBytes) ?: false
+        if (!sendSuccess) {
+            textViewResponse.text = "Failed to send command"
+            return
+        }
+
+        // Read response and convert to hex string with proper byte handling
+        val response = usbDeviceHandler?.readCommand()
+        val responseText = when {
+            response == null -> "Failed to read response"
+            response.isEmpty() -> "No response data (0 bytes)"
+            else -> response.joinToString(" ") { byte ->
+                "0x%02X".format(byte.toInt() and 0xFF)
+            }
+        }
+
+        Log.d(TAG, "Raw response bytes: ${response?.joinToString(", ") { it.toInt().toString() }}")
+
+        /* Read response
+        val response = usbDeviceHandler?.readCommand()
+        val responseText = response?.let { String(it) } ?: "No response"
+        */
+
+        val resultText = StringBuilder().apply {
+            //append("Command: ${command.command}\n")
+            append("Response Comparison:\n")
+            append("  Actual:    ${responseText}\n")
+            append("  Expected:  ${command.response}")
+        }.toString()
+
+        textViewResponse.text = resultText
+    }
+
     private fun setupSpinner() {
         val spinnerItems = mutableListOf(DEFAULT_SELECTION).apply {
             addAll(commands.map { it.description })
@@ -145,8 +206,9 @@ class CommandTabView @JvmOverloads constructor(
                     textViewResponse.text = ""
                 } else {
                     val command = commands[position - 1]
-                    textViewCommand.text = "Command: ${command.command}"
-                    textViewResponse.text = "Expected Response: ${command.response}"
+                    textViewCommand.text = "Selected Command: ${command.command}"
+                    //textViewResponse.text = "Expected Response: ${command.response}"
+                    executeCommand(command)
                 }
             }
 
