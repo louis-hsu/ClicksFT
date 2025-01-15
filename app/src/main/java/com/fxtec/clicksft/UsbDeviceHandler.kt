@@ -199,22 +199,6 @@ class UsbDeviceHandler(private val context: Context) {
         }
     }
 
-    /*
-    fun readCommand(bufferSize: Int = 64): ByteArray? {
-        if (!isDeviceReady()) return null
-
-        val buffer = ByteArray(bufferSize)
-        val result = usbConnection?.bulkTransfer(
-            endpointIn,
-            buffer,
-            buffer.size,
-            TIMEOUT
-        ) ?: -1
-
-        return if (result > 0) buffer.copyOf(result) else null
-    }
-    */
-
     private fun isDeviceReady(): Boolean {
         return usbConnection != null &&
                 usbInterface != null &&
