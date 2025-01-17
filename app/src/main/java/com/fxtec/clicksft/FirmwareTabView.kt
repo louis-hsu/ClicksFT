@@ -29,7 +29,7 @@ class FirmwareTabView @JvmOverloads constructor(
         textViewDebugInfo.text = "Waiting for USB device..."
     }
 
-    fun updateFirmwareInfo(handler: UsbDeviceHandler?) {
+    fun updateFirmwareTab(handler: UsbDeviceHandler?) {
         Log.d(TAG, "Updating firmware info")
         usbDeviceHandler = handler
         if (usbDeviceHandler?.getDeviceInfo() == null) {

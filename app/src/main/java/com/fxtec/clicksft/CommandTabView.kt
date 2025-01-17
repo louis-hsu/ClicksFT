@@ -55,8 +55,18 @@ class CommandTabView @JvmOverloads constructor(
         documentPickerHelper = handler
     }
 
-    fun setUsbDeviceHandler(handler: UsbDeviceHandler) {
+    fun updateCommandTab(handler: UsbDeviceHandler) {
         usbDeviceHandler = handler
+
+        // Reset tab to default status
+        xmlFileUri = null
+        xmlFormat = XmlFormat.COMMAND
+        loadCommands()
+        setupSpinner()
+        spinner.setSelection(0)
+
+        textViewCommand.text = ""
+        textViewResponse.text = ""
     }
 
     private fun initializeViews() {

@@ -9,7 +9,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.tabs.TabLayout
 import android.hardware.usb.*
-import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import android.net.Uri
@@ -64,7 +63,7 @@ class MainActivity : AppCompatActivity(), CommandTabView.DocumentPickerHelper {
         usbDeviceHandler = UsbDeviceHandler(this)
         usbDeviceHandler.setDeviceInfo(textViewDeviceInfo)
 
-        commandTabView.setUsbDeviceHandler(usbDeviceHandler)
+        commandTabView.updateCommandTab(usbDeviceHandler)
     }
 
     private fun setupTabs() {
@@ -81,7 +80,7 @@ class MainActivity : AppCompatActivity(), CommandTabView.DocumentPickerHelper {
                     1 -> {
                         commandTabView.visibility = View.GONE
                         firmwareTabView.visibility = View.VISIBLE
-                        firmwareTabView.updateFirmwareInfo(usbDeviceHandler)
+                        firmwareTabView.updateFirmwareTab(usbDeviceHandler)
                     }
                 }
             }
@@ -113,8 +112,8 @@ class MainActivity : AppCompatActivity(), CommandTabView.DocumentPickerHelper {
 
     private fun updateTabsIfNeeded() {
         when (tabLayout.selectedTabPosition) {
-            0 -> commandTabView.setUsbDeviceHandler(usbDeviceHandler)
-            1 -> firmwareTabView.updateFirmwareInfo(usbDeviceHandler)
+            0 -> commandTabView.updateCommandTab(usbDeviceHandler)
+            1 -> firmwareTabView.updateFirmwareTab(usbDeviceHandler)
         }
         //if (tabLayout.selectedTabPosition == 1) {
         //    firmwareTabView.updateFirmwareInfo(usbDeviceHandler)
